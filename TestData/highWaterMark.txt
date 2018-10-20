@@ -1,8 +1,9 @@
 //Im a comment
 @3
+D=A
 D=M
 @5
-D=D-A
+M=D-A
 @100 
 
    //Im another comment  
