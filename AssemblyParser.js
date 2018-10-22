@@ -5,11 +5,12 @@ const GetParser = require("../LinerReader/linereader");
 
 class AssemblyParser {
     
-    constructor(filename, cm) {
-        this.cm = cm;
-        this.cm.populateMaps();
-        this.reader = GetParser(filename, 1024);
+    constructor(filename, codeModule, symbolTable, delim="\n") {
+        this.codeModule = codeModule;
+        this.symbolTable = symbolTable;
+        this.reader = GetParser(filename, 1024, delim);
         this.buffer = [];
+        this.currentLineNumber = 0;
     }
 
     isComment(line) {
@@ -17,16 +18,18 @@ class AssemblyParser {
     }
 
     isACommand(line) {
-        return (line.match(/^@\d+/g) === null) ? false : true;
+       return line.match(/^@[aA-zZ]+$|^@\d+$/g) 
     }
 
     getACommandValue(line) {
         const value = line.replace(/^@/,"");
-        if(!Number.isNaN(value)) {
-            const binaryValue = "0" + this.cm.convertToBinary(parseInt(value), 15, false);
+        if(!isNaN(value)) {
+            //console.log(value)
+            const binaryValue = "0" + this.codeModule.convertToBinary(parseInt(value), 15, false);
             return binaryValue;
+        } else {
+            //console.log(value);
         }
-        throw new Error("Nan")
     }
 
     isCCommand(line) {
@@ -56,9 +59,9 @@ class AssemblyParser {
         }
 
         if(!comp) throw Error(`Line ${line}: Comp cannot be empty`)
-        destB = (dest) ?  this.cm.getDest(dest) : this.cm.convertToBinary(0, 3, true);
-        compB =  this.cm.getComp(comp);
-        jmpB = (jmp) ? this.cm.getJmp(jmp) : this.cm.convertToBinary(0, 3, true);
+        destB = (dest) ?  this.codeModule.getDest(dest) : this.codeModule.convertToBinary(0, 3, true);
+        compB =  this.codeModule.getComp(comp);
+        jmpB = (jmp) ? this.codeModule.getJmp(jmp) : this.codeModule.convertToBinary(0, 3, true);
         return "111".concat(compB, destB, jmpB);
     }
 
@@ -68,18 +71,22 @@ class AssemblyParser {
             const currentState = this.reader.next();
             const line = currentState.value.trim();
             let value;
-
+               console.log(line);
             if(this.isComment(line)) {
                // console.log("Comment");
+
             } else if (this.isACommand(line)) {
                //console.log("A Value");
                value = this.getACommandValue(line);
-               this.buffer.push(value);
+               this.buffer.push({line: this.currentLineNumber, value: value});
+               this.currentLineNumber++;
+
 
             } else if (this.isCCommand(line)) {
                //console.log("C Command");
                value = this.getCComanndValue(line);
-               this.buffer.push(value);
+               this.buffer.push({line: this.currentLineNumber, value: value});
+               this.currentLineNumber++;
 
             } else if (line === "") {
                //console.log("Whitespace")
@@ -89,7 +96,7 @@ class AssemblyParser {
             if(currentState.done) {
                 const stream = fs.createWriteStream("./test.hack")
              this.buffer.forEach( ele => {
-                 stream.write(`${ele}\r\n`, "utf8")
+                 stream.write(`Linenumber ${ele.line} -> ${ele.value}\r\n`, "utf8")
              })
                 break;
             }

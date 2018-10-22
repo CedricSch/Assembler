@@ -1,15 +1,8 @@
 //Im a comment
 @3
+@3
 D=A
-D=M
-@5
-M=D-A
-@100 
+!D
 
-   //Im another comment  
-D;JEQ
-@200
-0;JMP
-
-@1
-@10
+@variable
+@stwk

@@ -5,7 +5,7 @@ class CodeModule {
         this.compMap = new Map();
         this.destMap = new Map();
         this.jmpMap = new Map();
-        
+        this.populateMaps();
     }
 
  convertToBinary(number, n, rev) {
@@ -33,7 +33,7 @@ class CodeModule {
     getJmp(mnemonic) {
          if(this.jmpMap.has(mnemonic)) {
            const binary = this.convertToBinary(this.jmpMap.get(mnemonic).dez, 3, true);
-           console.log(`Mnmonic ${mnemonic} -> ${binary}`)
+        //    console.log(`Mnmonic ${mnemonic} -> ${binary}`)
            return binary;
         } else {
             throw new Error(`Mnemonic ${mnemonic} not in jmp table!`)
