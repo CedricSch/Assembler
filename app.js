@@ -9,8 +9,21 @@ debugger;
 const cm = new CodeModule();
 const st = new SymbolTable();
 const ass = new AssemblyParser("./TestData/highWaterMark.txt", cm, st);
-debugger; ass.parse();
-console.log("Debu8g")
-// console.log(cm.getDest("D"));
-//console.log(cm.getComp("D+1"));
- //console.log(ass.getCComanndValue("M=D"));
+// ass.parse();
+
+ass.firstPass();
+
+//const l1 = "(HELLO)", l2 = "(1HELLO)", l3 = "(__!12asasd)";
+
+// log(l1,l2,l3);
+
+// function log(...args) {
+    
+//     for(let a of args) {
+//         if(ass.isLabel(a)) {
+//             console.log(`${a} is a label -> ${ass.getLabel(a)}`)
+//         } else {
+//             console.log(`${a} is no label!`)
+//         }
+//     }
+// }

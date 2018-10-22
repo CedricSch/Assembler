@@ -8,15 +8,23 @@ class SymbolTable {
     }
 
     addEntry(symbol, address) {
-    
+        if(!this.contains(symbol)) {
+            this.table.set(symbol, address);
+        } else {
+            throw Error(`Symbol ${symbol} already in the table!`)
+        }
     }
 
     contains(symbol) {
-
+        return this.table.has(symbol);
     }
 
     getAddress(symbol) {
-
+        if(this.contains(symbol)) {
+            return this.table.get(symbol);
+        } else {
+            throw Error(`Symbol ${symbol} not in the table! Therefore no address!`)
+        }
     }
 
     populateTable() {

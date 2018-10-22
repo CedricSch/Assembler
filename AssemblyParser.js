@@ -9,8 +9,8 @@ class AssemblyParser {
         this.codeModule = codeModule;
         this.symbolTable = symbolTable;
         this.reader = GetParser(filename, 1024, delim);
+        this.symbolReader = GetParser(filename, 1024, delim);
         this.buffer = [];
-        this.currentLineNumber = 0;
     }
 
     isComment(line) {
@@ -65,43 +65,57 @@ class AssemblyParser {
         return "111".concat(compB, destB, jmpB);
     }
 
+    isLabel(line) {
+        return line.match(/^\(\D.+\)$/g);
+    }
+
+    getLabel(line) {
+        return line.replace(/^\(|\)$/g, "")
+    }
     
-    parse() {
+    parse(firstPass) {
         while(true) {
             const currentState = this.reader.next();
             const line = currentState.value.trim();
+            let currentLineNumber = 0;
             let value;
-               console.log(line);
-            if(this.isComment(line)) {
-               // console.log("Comment");
+            
+                //console.log(line);
+                if(this.isComment(line)) {
+                // console.log("Comment");
 
-            } else if (this.isACommand(line)) {
-               //console.log("A Value");
-               value = this.getACommandValue(line);
-               this.buffer.push({line: this.currentLineNumber, value: value});
-               this.currentLineNumber++;
+                } else if (this.isACommand(line)) {
+                //console.log("A Value");
+                value = this.getACommandValue(line);
+                this.buffer.push({line: this.currentLineNumber, value: value});
+                currentLineNumber++;
 
+                } else if (this.isCCommand(line)) {
+                //console.log("C Command");
+                value = this.getCComanndValue(line);
+                this.buffer.push({line: this.currentLineNumber, value: value});
+                currentLineNumber++;
 
-            } else if (this.isCCommand(line)) {
-               //console.log("C Command");
-               value = this.getCComanndValue(line);
-               this.buffer.push({line: this.currentLineNumber, value: value});
-               this.currentLineNumber++;
+                } else if (line === "") {
+                //console.log("Whitespace")
 
-            } else if (line === "") {
-               //console.log("Whitespace")
-
-            }
+                }
 
             if(currentState.done) {
-                const stream = fs.createWriteStream("./test.hack")
-             this.buffer.forEach( ele => {
-                 stream.write(`Linenumber ${ele.line} -> ${ele.value}\r\n`, "utf8")
-             })
+                //console.log(this.symbolTable.table);
+                this.buffer = [];
+                currentLineNumber = 0;
                 break;
             }
         }
      }
+}
+
+function WritableStream() {
+    const stream = fs.createWriteStream("./test.hack")
+    this.buffer.forEach( ele => {
+        stream.write(`Linenumber ${ele.line} -> ${ele.value}\r\n`, "utf8")
+    })
 }
 
 module.exports = AssemblyParser;

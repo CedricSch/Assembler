@@ -1,8 +1,10 @@
-//Im a comment
-@3
-@3
-D=A
-!D
-
-@variable
-@stwk
+//Comment
+@i
+@sum
+(LOOP)
+@1
+@1
+@1
+@1
+(END)
+@1
